@@ -48,4 +48,9 @@ export const AuthManager = {
   logout() {
     localStorage.removeItem(AUTH_KEY);
   },
+
+  getToken(): string | null {
+    const data = this.getAuthData();
+    return data?.access_token || null;
+  },
 };
