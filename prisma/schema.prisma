@@ -8,9 +8,17 @@ datasource db {
 }
 
 model Account {
-  account_id       Int      @id @default(autoincrement())
-  account_user     String   @unique
-  account_password String
-  account_type     String
-  is_active        Boolean  @default(true)
+  account_id       Int          @id @default(autoincrement()) @map("Account_id")
+  account_user     String       @unique @map("Account_user")
+  account_password String       @map("Account_password")
+  account_type     AccountType  @map("Account_type")
+  account_email    String?      @map("Account_email")
+  is_active        Boolean      @default(true) @map("is_active")
+
+  @@map("Account")
+}
+
+enum AccountType {
+  administrator
+  user
 }
