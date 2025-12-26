@@ -4,10 +4,7 @@ import { LoginResponse } from "@/types/account";
 export interface AuthContextType {
   user: LoginResponse | null;
   isAuthenticated: boolean;
-  login: (
-    account_user: string,
-    account_password: string
-  ) => Promise<LoginResponse>;
+  login: (user: string, password: string) => Promise<LoginResponse>;
   logout: () => void;
 }
 
