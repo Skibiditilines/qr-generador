@@ -4,55 +4,48 @@ import { signToken } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
 interface LoginRequest {
-  account_user: string;
-  account_password: string;
+  user: string;
+  password: string;
 }
 
 export async function POST(req: Request) {
   try {
     const body: LoginRequest = await req.json();
-    const { account_user, account_password } = body;
+    const { user, password } = body;
 
-    // Buscar usuario activo por username
-    const user = await prisma.account.findUnique({
-      where: { account_user },
+    const account = await prisma.account.findUnique({
+      where: { user },
     });
 
-    if (!user || !user.is_active) {
+    if (!account || !account.is_active) {
       return NextResponse.json(
-        { message: "Credenciales inválidas" },
+        { message: "Invalid credentials" },
         { status: 401 }
       );
     }
 
-    // Verificar contraseña
-    const isValid = await verifyPassword(
-      account_password,
-      user.account_password
-    );
+    const isValid = await verifyPassword(password, account.password);
     if (!isValid) {
       return NextResponse.json(
-        { message: "Credenciales inválidas" },
+        { message: "Invalid credentials" },
         { status: 401 }
       );
     }
 
-    // Generar token JWT usando account_id como sub
     const token = signToken({
-      sub: user.account_id, // más seguro que usar el username
-      type: user.account_type,
+      sub: account.account_id,
+      type: account.account_type,
     });
 
-    // Timestamp de expiración en segundos
-    const exp = Math.floor(Date.now() / 1000) + 30 * 60; // 30 min
+    const exp = Math.floor(Date.now() / 1000) + 30 * 60;
 
     return NextResponse.json({
       access_token: token,
-      account_type: user.account_type,
+      account_type: account.account_type,
       exp,
     });
   } catch (error) {
     console.error("Login error:", error);
-    return NextResponse.json({ message: "Error interno" }, { status: 500 });
+    return NextResponse.json({ message: "Internal error" }, { status: 500 });
   }
 }

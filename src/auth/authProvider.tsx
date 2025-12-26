@@ -12,7 +12,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Solo se ejecuta en el cliente
     const auth = AuthManager.getAuthData();
     if (auth) {
       setUser(auth);
@@ -21,9 +20,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
   }, []);
 
-  async function login(account_user: string, account_password: string) {
+  async function login(user: string, password: string) {
     setLoading(true);
-    const data = await loginService({ account_user, account_password });
+    const data = await loginService({ user, password });
 
     const authData: LoginResponse = {
       access_token: data.access_token,

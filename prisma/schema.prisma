@@ -8,17 +8,37 @@ datasource db {
 }
 
 model Account {
-  account_id       Int          @id @default(autoincrement()) @map("Account_id")
-  account_user     String       @unique @map("Account_user")
-  account_password String       @map("Account_password")
-  account_type     AccountType  @map("Account_type")
-  account_email    String?      @map("Account_email")
-  is_active        Boolean      @default(true) @map("is_active")
+  account_id   Int          @id @default(autoincrement()) @map("Account_id")
+  user         String       @unique @map("Account_user")
+  password     String       @map("Account_password")
+  account_type AccountType  @map("Account_type")
+  email        String?      @map("Account_email")
+  createdAt    DateTime     @default(now()) @map("Acc_creation_date")
+  is_active    Boolean      @default(true) @map("is_active")
+
+  concepts     Concept[]    @relation("AccountConcepts")
 
   @@map("Account")
+}
+
+model Concept {
+  concept_id  Int      @id @default(autoincrement()) @map("Concept_id")
+  date        DateTime @map("Concept_date")
+  content     String   @map("Content")
+  color       String   @map("Concept_color")
+  image_url   String?  @map("Concept_Image")
+  slug        String   @unique @map("Concept_slug")
+  note        String?  @map("Concept_note")
+  is_active   Boolean  @default(true) @map("is_active")
+  account_id  Int      @map("Account_id")
+
+  account     Account  @relation("AccountConcepts", fields: [account_id], references: [account_id])
+
+  @@map("Concept")
 }
 
 enum AccountType {
   administrator
   user
 }
+
