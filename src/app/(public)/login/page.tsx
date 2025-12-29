@@ -1,17 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/auth/useAuth";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const router = useRouter();
 
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/historial");
+    }
+  }, [isAuthenticated, router]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -36,7 +42,6 @@ export default function LoginPage() {
   return (
     <div className="min-vh-100 d-flex align-items-center justify-content-center">
       <div>
-        {/* Icono */}
         <div className="text-center mb-3">
           <div
             className="d-inline-flex align-items-center justify-content-center rounded-4 bg-primary bg-opacity-10"
@@ -46,19 +51,16 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Título */}
         <h4 className="text-center fw-semibold mb-1">Bienvenido de nuevo</h4>
         <p className="text-center text-muted mb-4">
           Ingresa tu usuario y contraseña para acceder
         </p>
 
-        {/* Formulario */}
         <div
           className="card shadow-sm border-0 p-4 rounded-4"
           style={{ width: 360 }}
         >
           <form onSubmit={handleLogin}>
-            {/* Usuario */}
             <div className="mb-3">
               <label className="form-label fw-medium">Usuario</label>
               <div className="input-group">
@@ -75,7 +77,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Contraseña */}
             <div className="mb-4">
               <label className="form-label fw-medium">Contraseña</label>
               <div className="input-group">
@@ -92,12 +93,10 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Error */}
             {error && (
               <div className="alert alert-danger py-2 text-center">{error}</div>
             )}
 
-            {/* Botón */}
             <button
               type="submit"
               className="btn btn-primary w-100 py-2 fw-semibold"

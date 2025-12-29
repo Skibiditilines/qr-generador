@@ -1,10 +1,11 @@
 :root {
   --background: #f0f4f8;
   --foreground: #1e293b;
+  --font-montserrat: "Montserrat", sans-serif;
 }
 
 html[data-bs-theme="dark"] {
-  --background: #0a0a0a;
+  --background: #14171d;
   --foreground: #ededed;
 }
 

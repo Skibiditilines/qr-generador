@@ -2,9 +2,14 @@ import { LoginResponse } from "@/types/account";
 
 const AUTH_KEY = "auth_data";
 
+function isClient() {
+  return typeof window !== "undefined";
+}
+
 export const AuthManager = {
   saveAuthData(data: LoginResponse) {
-    // Convertir exp a timestamp en segundos si viene como string
+    if (!isClient()) return;
+
     const expTimestamp =
       typeof data.exp === "string"
         ? Math.floor(new Date(data.exp).getTime() / 1000)
@@ -18,39 +23,44 @@ export const AuthManager = {
       throw new Error("Invalid auth data");
     }
 
-    const dataToStore = { ...data, exp: expTimestamp };
-    localStorage.setItem(AUTH_KEY, JSON.stringify(dataToStore));
+    localStorage.setItem(
+      AUTH_KEY,
+      JSON.stringify({ ...data, exp: expTimestamp })
+    );
   },
 
   getAuthData(): LoginResponse | null {
+    if (!isClient()) return null;
+
     const raw = localStorage.getItem(AUTH_KEY);
     if (!raw) return null;
 
     try {
       const parsed = JSON.parse(raw) as LoginResponse;
+
       const expTimestamp =
         typeof parsed.exp === "string"
           ? Math.floor(new Date(parsed.exp).getTime() / 1000)
           : parsed.exp;
 
-      if (Date.now() / 1000 > expTimestamp) return null;
+      if (Date.now() / 1000 > expTimestamp) {
+        localStorage.removeItem(AUTH_KEY);
+        return null;
+      }
 
       return { ...parsed, exp: expTimestamp };
     } catch {
+      localStorage.removeItem(AUTH_KEY);
       return null;
     }
   },
 
-  isAuthenticated(): boolean {
-    return !!this.getAuthData();
-  },
-
   logout() {
+    if (!isClient()) return;
     localStorage.removeItem(AUTH_KEY);
   },
 
   getToken(): string | null {
-    const data = this.getAuthData();
-    return data?.access_token || null;
+    return this.getAuthData()?.access_token || null;
   },
 };

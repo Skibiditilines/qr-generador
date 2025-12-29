@@ -14,27 +14,17 @@ export default function ProtectedLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    if (isAuthenticated === null)
-      if (!isAuthenticated) {
-        router.replace("/login");
-        return;
-      }
+    if (!isAuthenticated) {
+      router.replace("/login");
+      return;
+    }
 
-    if (
-      pathname.startsWith("/admin") &&
-      user?.account_type !== "administrator"
-    ) {
+    if (user?.account_type !== "administrator") {
       router.replace("/historial");
     }
   }, [isAuthenticated, user, pathname, router]);
 
-  if (isAuthenticated === null || !isAuthenticated) {
-    return (
-      <div className="min-vh-100 d-flex align-items-center justify-content-center">
-        <div className="spinner-border" />
-      </div>
-    );
-  }
+  if (!isAuthenticated) return null;
 
   return <>{children}</>;
 }
