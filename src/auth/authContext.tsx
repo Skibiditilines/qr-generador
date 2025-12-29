@@ -3,7 +3,8 @@ import { LoginResponse } from "@/types/account";
 
 export interface AuthContextType {
   user: LoginResponse | null;
-  isAuthenticated: boolean;
+  isAuthenticated: boolean | null;
+  isLoading: boolean;
   login: (user: string, password: string) => Promise<LoginResponse>;
   logout: () => void;
 }

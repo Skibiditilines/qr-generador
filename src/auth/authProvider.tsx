@@ -9,22 +9,24 @@ import { LoginResponse } from "@/types/account";
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<LoginResponse | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
     const auth = AuthManager.getAuthData();
+
     if (auth) {
       setUser(auth);
       setIsAuthenticated(true);
     }
-    setLoading(false);
+
+    setInitializing(false);
   }, []);
 
   async function login(user: string, password: string) {
-    setLoading(true);
     const data = await loginService({ user, password });
 
     const authData: LoginResponse = {
+      account_id: data.account_id,
       access_token: data.access_token,
       account_type: data.account_type,
       exp: data.exp,
@@ -33,7 +35,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     AuthManager.saveAuthData(authData);
     setUser(authData);
     setIsAuthenticated(true);
-    setLoading(false);
 
     return authData;
   }
@@ -44,10 +45,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsAuthenticated(false);
   }
 
-  if (loading) return <div>Cargando...</div>;
+  if (initializing) {
+    return (
+      <div className="min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="spinner-border" />
+      </div>
+    );
+  }
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        isLoading: initializing,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -29,7 +29,7 @@ model Concept {
   image_url   String?  @map("Concept_Image")
   slug        String   @unique @map("Concept_slug")
   note        String?  @map("Concept_note")
-  is_active   Boolean  @default(true) @map("is_active")
+  is_active   Boolean  @default(true) @map("Is_active")
   account_id  Int      @map("Account_id")
 
   account     Account  @relation("AccountConcepts", fields: [account_id], references: [account_id])
