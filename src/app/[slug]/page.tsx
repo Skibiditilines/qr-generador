@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
+import QRCardUI from "@/components/QRCard";
 
-interface ConceptPageProps {
+interface Props {
   params: Promise<{
     slug: string;
   }>;
 }
 
-export default async function ConceptPage({ params }: ConceptPageProps) {
+export default async function ConceptPage({ params }: Props) {
   const { slug } = await params;
 
   const res = await fetch(
@@ -14,31 +15,22 @@ export default async function ConceptPage({ params }: ConceptPageProps) {
     { cache: "no-store" }
   );
 
-  if (!res.ok) {
+  if (!res.ok) notFound();
+
+  const data = await res.json();
+
+  if (!Array.isArray(data) || data.length === 0) {
     notFound();
   }
 
-  const concept = await res.json();
+  const concept = data[0];
 
   return (
-    <main className="min-vh-100 d-flex align-items-center justify-content-center">
-      <div className="card p-4 shadow-sm rounded-4" style={{ maxWidth: 500 }}>
-        <h4 className="fw-semibold mb-3">Resultado del QR</h4>
-
-        <p className="text-muted mb-2">
-          Código: <strong>{concept.slug}</strong>
-        </p>
-
-        <div className="alert alert-primary text-center">{concept.content}</div>
-
-        <p className="text-muted small text-end mb-0">
-          {new Date(concept.date).toLocaleDateString()}{" "}
-          {new Date(concept.date).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </p>
-      </div>
+    <main
+      className="d-flex justify-content-center align-items-center px-3 py-5"
+      style={{ height: "100dvh", width: "100vw", overflow: "hidden" }}
+    >
+      <QRCardUI concept={concept} />
     </main>
   );
 }
