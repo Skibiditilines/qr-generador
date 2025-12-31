@@ -22,6 +22,7 @@ export async function PUT(req: Request) {
             where: {
                 concept_id: concept_id,
                 account_id: accountId,
+                is_active: true,
             },
         });
 
