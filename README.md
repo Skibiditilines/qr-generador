@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# QR Generador - AvonQrTS
 
-## Getting Started
+Este proyecto es una aplicación web construida con Next.js que permite la gestión de conceptos y usuarios, probablemente enfocada en la generación o gestión de códigos QR.
 
-First, run the development server:
+## 📂 Estructura del Proyecto
+
+La estructura principal del proyecto es la siguiente:
+
+- **`src/app`**: Contiene la lógica principal de la aplicación y el enrutamiento (App Router).
+- **`src/app/api`**: Define los endpoints de la API (Backend).
+- **`src/lib`**: Utilidades y configuraciones compartidas (ej. cliente de Prisma, autenticación).
+- **`prisma`**: Esquema de la base de datos y migraciones.
+- **`public`**: Archivos estáticos.
+
+## 📦 Listado de Dependencias Principales
+
+Las dependencias clave utilizadas en este proyecto son:
+
+- **Framework**: `next`, `react`, `react-dom`
+- **Base de Datos**: `prisma`, `@prisma/client`
+- **Autenticación**: `jsonwebtoken`, `bcryptjs`
+- **UI/Estilos**: `bootstrap`, `bootstrap-icons`
+- **Utilidades**: `qrcode` (Generación de QRs), `react-markdown`
+
+## 🛠 Instalación de Dependencias
+
+Para instalar todas las dependencias necesarias, ejecuta el siguiente comando en la terminal:
+
+```bash
+npm install
+```
+
+> **Nota:** Este proyecto utiliza un script `postinstall` que ejecuta `prisma generate` automáticamente.
+
+## 🚀 Correr la Aplicación
+
+Para iniciar el servidor de desarrollo, utiliza:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+La aplicación estará disponible en `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🔌 Rutas del Backend
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+A continuación se listan los endpoints disponibles en la API:
 
-## Learn More
+### Users (`/api/users`)
+- `POST /api/users/login`: Iniciar sesión.
+- `GET /api/users/get-auth`: Verificar estado de autenticación (Token válido).
 
-To learn more about Next.js, take a look at the following resources:
+### Concepts (`/api/concepts`)
+- `GET /api/concepts/get-concepts`: Obtener lista de conceptos.
+- `GET /api/concepts/get-concept-by-slug`: Obtener un concepto específico por slug.
+- `POST /api/concepts/create-concept`: Crear un nuevo concepto.
+- `PUT /api/concepts/update-concept`: Actualizar un concepto existente.
+- `DELETE /api/concepts/delete-concept`: Eliminar un concepto.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### System
+- `GET /api/health`: Comprobación de estado del sistema.
