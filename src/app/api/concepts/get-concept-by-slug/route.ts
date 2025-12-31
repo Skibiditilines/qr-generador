@@ -32,6 +32,13 @@ export async function GET(req: Request) {
         date: "desc",
       },
     });
+    if (!concepts || concepts.length === 0) {
+      return NextResponse.json(
+        { message: "Concept not found" },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json(concepts);
   } catch (error) {
     console.error("Get concepts by slug error:", error);

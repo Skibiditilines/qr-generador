@@ -1,0 +1,62 @@
+@baseUrl = http://localhost:3000/api
+# @baseUrl = https://backend-avonqr.vercel.app/api
+
+### LOGIN (Autenticación de usuario)
+# @name Login
+# Endpoint para obtener el token JWT.
+POST {{baseUrl}}/users/login
+Content-Type: application/json
+
+{
+  "user": "admin",
+  "password": "password"
+}
+
+### GET AUTH (Verificar Token)
+# Solo debe comprobar que el usuario tenga un token activo
+GET {{baseUrl}}/users/get-auth
+Authorization: Bearer {{Login.response.body.access_token}}
+
+### HEALTH CHECK
+GET {{baseUrl}}/health
+
+
+### --- CONCEPTS ---
+
+### GET CONCEPTS (Listar Conceptos)
+GET {{baseUrl}}/concepts/get-concepts
+Authorization: Bearer {{Login.response.body.access_token}}
+
+### CREATE CONCEPT
+# @name CreateConcept
+POST {{baseUrl}}/concepts/create-concept
+Authorization: Bearer {{Login.response.body.access_token}}
+Content-Type: application/json
+
+{
+  "content": "Contenido de prueba",
+  "color": "#FF5733",
+  "image_url": "https://example.com/image.png",
+  "slug": "concepto-prueba-{{$randomInt}}",
+  "note": "Nota opcional"
+}
+
+### GET CONCEPT BY SLUG (Publico)
+@slug = CreateConcept.response.body.slug
+GET {{baseUrl}}/concepts/get-concept-by-slug?slug={{slug}}
+
+### UPDATE CONCEPT
+@id = 5
+PUT {{baseUrl}}/concepts/update-concept
+Authorization: Bearer {{Login.response.body.access_token}}
+Content-Type: application/json
+
+{
+  "concept_id": {{id}},
+  "content": "# Contenido actualizado de prueba aun eliminado",
+  "note": "Nota este concepto esta eliminado"
+}
+
+### DELETE CONCEPT
+DELETE {{baseUrl}}/concepts/delete-concept?id={{id}}
+Authorization: Bearer {{Login.response.body.access_token}}
