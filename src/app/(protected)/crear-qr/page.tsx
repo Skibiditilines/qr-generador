@@ -236,12 +236,12 @@ export default function CrearQRPage() {
                 </div>
               </div>
 
-              <div className="col-12 col-md-6">
-                <div className="card h-100 p-3 shadow-sm rounded-4">
+              <div className="col-12 col-md-6 mb-3">
+                <div className="card p-3 shadow-sm rounded-4">
                   <label className="form-label fw-bold mb-3">
                     Formato de descarga
                   </label>
-                  <div className="d-flex flex-column justify-content-center flex-grow-1 gap-2">
+                  <div className="d-flex justify-content-center flex-grow-1 gap-2">
                     {["png", "jpg", "pdf"].map((fmt) => (
                       <button
                         key={fmt}
@@ -249,9 +249,10 @@ export default function CrearQRPage() {
                           downloadFormat === fmt
                             ? "btn-primary"
                             : "btn-outline-secondary"
-                        }`}
+                        } rounded-4 fw-bold py-2 fs-6`}
                         onClick={() => setDownloadFormat(fmt)}
                         disabled={isLoading}
+                        style={{ width: "100px", height: "45px" }}
                       >
                         {fmt.toUpperCase()}
                       </button>
