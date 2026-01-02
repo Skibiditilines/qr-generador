@@ -11,12 +11,10 @@ export default function Home() {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.replace("/login");
+      router.push("/login");
       return;
-    }
-
-    if (user?.account_type !== "administrator") {
-      router.replace("/historial");
+    } else {
+      router.push("/historial");
     }
   }, [isAuthenticated, user, pathname, router]);
 
