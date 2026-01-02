@@ -5,7 +5,7 @@ import QRCode from "qrcode";
 export default function ConceptCard({ concept }: { concept: ConceptResponse }) {
   const [qr, setQr] = useState<string>("");
 
-  const url = `http://qr-generador-navy.vercel.app/${concept.slug}`;
+  const url = `http://generadordeqr.vercel.app/${concept.slug}`;
 
   useEffect(() => {
     QRCode.toDataURL(url, {

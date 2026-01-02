@@ -23,6 +23,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     document.documentElement.setAttribute("data-bs-theme", theme);
+    document.documentElement.setAttribute("data-color-mode", theme); // 👈 clave
     localStorage.setItem("theme", theme);
   }, [theme]);
 
