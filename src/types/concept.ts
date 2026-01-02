@@ -14,3 +14,14 @@ export interface AllConceptResponse {
   note: string;
   is_active: boolean;
 }
+
+export interface CreateConceptPayload {
+  content: string;
+  color?: string;
+  image_url?: string;
+  note?: string;
+}
+
+export interface CreateConceptResponse {
+  url: string;
+}

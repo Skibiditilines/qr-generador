@@ -26,10 +26,10 @@ export default function HistorialPage() {
   }, [user]);
 
   return (
-    <>
+    <div>
       <Header />
 
-      <main className="p-4">
+      <main className="p-4 container">
         {loadingConcepts && <p>Cargando conceptos...</p>}
         {error && <p className="text-danger">{error}</p>}
         {!loadingConcepts && concepts.length === 0 && (
@@ -42,6 +42,6 @@ export default function HistorialPage() {
           ))}
         </ul>
       </main>
-    </>
+    </div>
   );
 }
