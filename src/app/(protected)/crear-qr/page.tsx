@@ -25,12 +25,11 @@ export default function CrearQRPage() {
   // Estados del Formulario
   const [content, setContent] = useState<string>("");
   const [note, setNote] = useState<string>("");
-  const [color, setColor] = useState<string>("");
+  const [color, setColor] = useState<string>("#d41b1b");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [downloadFormat, setDownloadFormat] = useState<string>("png");
 
-  // 2. ESTADO: Guardamos la URL final que nos da el backend
   const [generatedUrl, setGeneratedUrl] = useState<string>("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -38,8 +37,8 @@ export default function CrearQRPage() {
   const previewConcept = {
     content: content || "Sin contenido",
     image_url: imagePreview || null,
-    note: note,
-    color: color,
+    note: note || null,
+    color: color || null,
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,8 +76,6 @@ export default function CrearQRPage() {
         image_url: finalImageUrl || undefined,
         note: note || undefined,
       });
-
-      console.log("QR Creado exitosamente:", result);
 
       if (result && result.url) {
         setGeneratedUrl(result.url);
@@ -169,8 +166,7 @@ export default function CrearQRPage() {
                   <label className="form-label fw-bold fs-6">
                     Nota <i>(opcional)</i>
                   </label>
-                  <input
-                    type="text"
+                  <textarea
                     className="form-control"
                     placeholder="Nota adicional"
                     value={note}
@@ -197,12 +193,10 @@ export default function CrearQRPage() {
               </div>
             </div>
 
-            <div className="row mt-3 g-3">
-              <div className="col-12 col-md-6">
+            <div className="row mt-3">
+              <div className="col-12 col-md-6 mb-3">
                 <div className="card h-100 p-3 shadow-sm rounded-4">
-                  <label className="form-label fw-bold mb-3">
-                    Imagen del QR
-                  </label>
+                  <label className="form-label fw-bold">Imagen del QR</label>
                   <div
                     className="d-flex flex-column align-items-center justify-content-center p-3 border border-2 border-dashed rounded flex-grow-1"
                     onClick={() => !isLoading && fileInputRef.current?.click()}
@@ -268,9 +262,17 @@ export default function CrearQRPage() {
               <QRCard concept={previewConcept as any} />
             </div>
 
-            {errorCreate && (
+            {errorCreate ? (
               <div className="alert alert-danger mt-3" role="alert">
                 {errorCreate}
+              </div>
+            ) : isCreated ? (
+              <div className="alert alert-success mt-3" role="alert">
+                ¡QR creado exitosamente! Puedes descargarlo ahora.
+              </div>
+            ) : (
+              <div className="alert alert-info mt-3" role="alert">
+                Completa el contenido y genera tu QR.
               </div>
             )}
 
