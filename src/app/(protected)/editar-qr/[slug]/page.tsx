@@ -59,9 +59,8 @@ export default function EditQrPage() {
           setColor(item.color || "#d41b1b");
           setImagePreview(item.image_url || null);
 
-          const baseUrl =
-            process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
-          setGeneratedUrl(`${baseUrl}/qr/${item.slug}`);
+          const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+          setGeneratedUrl(`${baseUrl}/${item.slug}`);
         } else {
           setErrorMsg("Concepto no encontrado");
         }
