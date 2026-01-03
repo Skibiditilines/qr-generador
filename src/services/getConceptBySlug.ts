@@ -4,7 +4,7 @@ export async function getConceptBySlug(
   slug: string
 ): Promise<AllConceptResponse[]> {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/concepts/get-concept-by-slug?slug=${slug}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/concepts/get-concept-by-slug?slug=${slug}`,
     { method: "GET" }
   );
   if (!response.ok) {

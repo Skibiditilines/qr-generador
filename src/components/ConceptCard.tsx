@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { ConceptResponse } from "@/types/concept";
+import { useRouter } from "next/navigation";
 import QRCode from "qrcode";
 
 export default function ConceptCard({ concept }: { concept: ConceptResponse }) {
+  const router = useRouter();
   const [qr, setQr] = useState<string>("");
 
   const url = `http://generadordeqr.vercel.app/${concept.slug}`;
@@ -72,6 +74,7 @@ export default function ConceptCard({ concept }: { concept: ConceptResponse }) {
           <button
             className="btn btn-sm btn-outline-primary d-flex align-items-center justify-content-center gap-1 flex-grow-1"
             style={{ fontSize: "12px" }}
+            onClick={() => router.push(`/editar-qr/${concept.slug}`)}
           >
             <i className="bi bi-pencil"></i>
             Editar

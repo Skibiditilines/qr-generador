@@ -1,35 +1,36 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useParams } from "next/navigation";
 import { useAuth } from "@/auth/useAuth";
 import { MarkdownEditor } from "@/components/MarkdownEditor";
-import { createConcept } from "@/services/createConcept";
-import { uploadImageToCloudinary } from "@/services/cloudinary";
 import Header from "@/components/Header";
 import QRCard from "@/components/QRCard";
+import { getConceptBySlug } from "@/services/getConceptBySlug";
+import { updateConcept } from "@/services/updateConcept";
+import { uploadImageToCloudinary } from "@/services/cloudinary";
 import QRCode from "qrcode";
 import jsPDF from "jspdf";
 
-export default function CrearQRPage() {
+export default function EditQrPage() {
   const { user } = useAuth();
+  const params = useParams();
 
-  useEffect(() => {
-    if (!user) return;
-  }, [user]);
-
-  // Estados de UI
-  const [errorCreate, setErrorCreate] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isCreated, setIsCreated] = useState<boolean>(false);
-
-  // Estados del Formulario
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [conceptId, setConceptId] = useState<number | null>(null);
   const [content, setContent] = useState<string>("");
   const [note, setNote] = useState<string>("");
   const [color, setColor] = useState<string>("#d41b1b");
+
+  // Manejo de Imágenes
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [downloadFormat, setDownloadFormat] = useState<string>("png");
 
+  // Estados de Descarga QR
+  const [downloadFormat, setDownloadFormat] = useState<string>("png");
   const [generatedUrl, setGeneratedUrl] = useState<string>("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -41,61 +42,92 @@ export default function CrearQRPage() {
     color: color || null,
   };
 
+  useEffect(() => {
+    const loadData = async () => {
+      const slug = String(params.slug);
+      if (!slug) return;
+
+      try {
+        setIsLoading(true);
+        const data = await getConceptBySlug(slug);
+
+        if (data && data.length > 0) {
+          const item = data[0];
+          setConceptId(item.concept_id);
+          setContent(item.content);
+          setNote(item.note || "");
+          setColor(item.color || "#d41b1b");
+          setImagePreview(item.image_url || null);
+
+          const baseUrl =
+            process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
+          setGeneratedUrl(`${baseUrl}/qr/${item.slug}`);
+        } else {
+          setErrorMsg("Concepto no encontrado");
+        }
+      } catch (err) {
+        console.error(err);
+        setErrorMsg("Error al cargar los datos del QR");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (user) {
+      loadData();
+    }
+  }, [params.slug, user]);
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setImageFile(file);
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
-      setIsCreated(false);
+      setSuccessMsg(null);
     }
   };
 
   const handleContentChange = (val: string) => {
     setContent(val);
-    setIsCreated(false);
+    setSuccessMsg(null);
   };
 
-  async function handleCreate() {
-    if (!user) return;
+  async function handleUpdate() {
+    if (!user || !conceptId) return;
 
-    setIsLoading(true);
-    setErrorCreate(null);
-    setIsCreated(false);
+    setIsSaving(true);
+    setErrorMsg(null);
+    setSuccessMsg(null);
 
     try {
-      let finalImageUrl = "";
+      let finalImageUrl = imagePreview;
 
       if (imageFile) {
         finalImageUrl = await uploadImageToCloudinary(imageFile);
       }
 
-      const result = await createConcept(user.access_token, {
-        content: content,
-        color: color || undefined,
-        image_url: finalImageUrl || undefined,
-        note: note || undefined,
+      await updateConcept(conceptId, user.access_token, {
+        content,
+        note,
+        color,
+        image_url: finalImageUrl || "",
       });
 
-      if (result && result.url) {
-        setGeneratedUrl(result.url);
-      } else {
-        setGeneratedUrl(typeof result === "string" ? result : content);
-      }
+      setSuccessMsg("¡Cambios guardados exitosamente!");
 
-      setIsCreated(true);
+      if (finalImageUrl) setImagePreview(finalImageUrl);
+      setImageFile(null);
     } catch (error) {
       console.error(error);
-      setErrorCreate(
-        (error as Error).message || "Error desconocido al crear el QR"
-      );
+      setErrorMsg((error as Error).message || "Error al actualizar el QR");
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   }
 
   const handleDownload = async () => {
-    if (!isCreated || !generatedUrl) return;
+    if (!generatedUrl) return;
 
     try {
       const opts = {
@@ -111,8 +143,7 @@ export default function CrearQRPage() {
       };
 
       const dataUrl = await QRCode.toDataURL(generatedUrl, opts);
-
-      const filename = `qr-${Date.now()}`;
+      const filename = `qr-${params.slug}`;
 
       if (downloadFormat === "pdf") {
         const pdf = new jsPDF({
@@ -120,7 +151,6 @@ export default function CrearQRPage() {
           unit: "mm",
           format: [100, 100],
         });
-
         pdf.addImage(dataUrl, "PNG", 10, 10, 80, 80);
         pdf.save(`${filename}.pdf`);
       } else if (downloadFormat === "jpg") {
@@ -128,7 +158,6 @@ export default function CrearQRPage() {
           ...opts,
           type: "image/jpeg",
         });
-
         const link = document.createElement("a");
         link.href = jpgDataUrl;
         link.download = `${filename}.jpg`;
@@ -144,10 +173,20 @@ export default function CrearQRPage() {
         document.body.removeChild(link);
       }
     } catch (err) {
-      console.error("Error generando la imagen para descarga", err);
-      alert("Error al generar el archivo de descarga");
+      console.error("Error generando descarga", err);
+      alert("Error al generar el archivo");
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -172,9 +211,9 @@ export default function CrearQRPage() {
                     value={note}
                     onChange={(e) => {
                       setNote(e.target.value);
-                      setIsCreated(false);
+                      setSuccessMsg(null);
                     }}
-                    disabled={isLoading}
+                    disabled={isSaving}
                   />
                 </div>
                 <div className="col-auto">
@@ -185,9 +224,9 @@ export default function CrearQRPage() {
                     value={color}
                     onChange={(e) => {
                       setColor(e.target.value);
-                      setIsCreated(false);
+                      setSuccessMsg(null);
                     }}
-                    disabled={isLoading}
+                    disabled={isSaving}
                   />
                 </div>
               </div>
@@ -199,9 +238,9 @@ export default function CrearQRPage() {
                   <label className="form-label fw-bold">Imagen del QR</label>
                   <div
                     className="d-flex flex-column align-items-center justify-content-center p-3 border border-2 border-dashed rounded flex-grow-1"
-                    onClick={() => !isLoading && fileInputRef.current?.click()}
+                    onClick={() => !isSaving && fileInputRef.current?.click()}
                     style={{
-                      cursor: isLoading ? "not-allowed" : "pointer",
+                      cursor: isSaving ? "not-allowed" : "pointer",
                       minHeight: "140px",
                     }}
                   >
@@ -215,7 +254,7 @@ export default function CrearQRPage() {
                     ) : (
                       <div className="text-center text-muted">
                         <i className="bi bi-camera fs-2"></i>
-                        <p className="mb-0">Haz clic para subir una imagen</p>
+                        <p className="mb-0">Clic para cambiar imagen</p>
                       </div>
                     )}
                     <input
@@ -224,7 +263,7 @@ export default function CrearQRPage() {
                       onChange={handleImageChange}
                       className="d-none"
                       accept="image/*"
-                      disabled={isLoading}
+                      disabled={isSaving}
                     />
                   </div>
                 </div>
@@ -245,7 +284,7 @@ export default function CrearQRPage() {
                             : "btn-outline-secondary"
                         } rounded-4 fw-bold py-2 fs-6`}
                         onClick={() => setDownloadFormat(fmt)}
-                        disabled={isLoading}
+                        disabled={isSaving}
                         style={{ width: "100px", height: "45px" }}
                       >
                         {fmt.toUpperCase()}
@@ -262,27 +301,27 @@ export default function CrearQRPage() {
               <QRCard concept={previewConcept as any} />
             </div>
 
-            {errorCreate ? (
+            {errorMsg ? (
               <div className="alert alert-danger mt-3" role="alert">
-                {errorCreate}
+                {errorMsg}
               </div>
-            ) : isCreated ? (
+            ) : successMsg ? (
               <div className="alert alert-success mt-3" role="alert">
-                ¡QR creado exitosamente! Puedes descargarlo ahora.
+                {successMsg}
               </div>
             ) : (
               <div className="alert alert-info mt-3" role="alert">
-                Completa el contenido y genera tu QR.
+                Actualiza el contenido y haz clic en &quot;Guardar Cambios&quot;
               </div>
             )}
 
             <div className="d-flex gap-2 mt-3">
               <button
                 className="btn btn-primary flex-grow-1 rounded-4 fw-bold py-2"
-                onClick={handleCreate}
-                disabled={isLoading || !content}
+                onClick={handleUpdate}
+                disabled={isSaving || !content}
               >
-                {isLoading ? (
+                {isSaving ? (
                   <span>
                     <span
                       className="spinner-border spinner-border-sm me-2"
@@ -292,17 +331,15 @@ export default function CrearQRPage() {
                     Guardando...
                   </span>
                 ) : (
-                  "Generar QR"
+                  "Guardar Cambios"
                 )}
               </button>
 
               <button
-                className={`btn btn-success rounded-4 d-flex align-items-center justify-content-center ${
-                  !isCreated ? "opacity-50" : ""
-                }`}
+                className="btn btn-success rounded-4 d-flex align-items-center justify-content-center"
                 style={{ width: "50px" }}
                 onClick={handleDownload}
-                disabled={!isCreated || isLoading}
+                disabled={isSaving}
                 title={`Descargar como ${downloadFormat.toUpperCase()}`}
               >
                 <i className="bi bi-download fs-5"></i>
