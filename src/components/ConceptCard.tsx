@@ -28,9 +28,8 @@ export default function ConceptCard({ concept }: { concept: ConceptResponse }) {
           )}
         </div>
 
-        {/* Sección de información (Link) */}
-        <div className="px-3 fs-6 pt-2">
-          <div className="d-flex justify-content-between align-items-center mb-1">
+        <div className="px-3 fs-6 pt-2 mb-2">
+          <div className="d-flex justify-content-between align-items-center">
             <small className="fw-medium">Link</small>
             <button
               className="btn btn-sm"
@@ -40,10 +39,16 @@ export default function ConceptCard({ concept }: { concept: ConceptResponse }) {
             </button>
           </div>
 
-          <p className="small text-break mb-3">{url}</p>
+          <a
+            className="small text-break mb-3"
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {url}
+          </a>
         </div>
 
-        {/* Sección de detalles (Formato/Fecha) */}
         <div className="px-3 mb-3 fs-6">
           <div className="row small">
             <div className="col-4">
@@ -63,7 +68,6 @@ export default function ConceptCard({ concept }: { concept: ConceptResponse }) {
           </div>
         </div>
 
-        {/* Footer con los 3 botones alineados */}
         <div className="px-3 pb-3 mt-auto d-flex gap-2">
           <button
             className="btn btn-sm btn-outline-primary d-flex align-items-center justify-content-center gap-1 flex-grow-1"

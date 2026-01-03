@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       data: {
         content,
         slug,
-        color: color || "#000000",
+        color: color || null,
         image_url: image_url || null,
         note: note || null,
         date: new Date(),

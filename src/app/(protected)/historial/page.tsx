@@ -7,40 +7,141 @@ import { ConceptResponse } from "@/types/concept";
 import ConceptCard from "@/components/ConceptCard";
 import Header from "@/components/Header";
 
+interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
 export default function HistorialPage() {
   const { user } = useAuth();
 
   const [concepts, setConcepts] = useState<ConceptResponse[]>([]);
+  const [meta, setMeta] = useState<PaginationMeta | null>(null);
+  const [page, setPage] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [loadingConcepts, setLoadingConcepts] = useState(false);
+
+  const LIMIT = 8;
 
   useEffect(() => {
     if (!user) return;
 
-    setLoadingConcepts(true);
+    const fetchConcepts = async () => {
+      setLoadingConcepts(true);
+      setError(null);
+      try {
+        const response = await getConcepts(
+          user.account_id,
+          user.access_token,
+          page,
+          LIMIT
+        );
 
-    getConcepts(user.account_id, user.access_token)
-      .then(setConcepts)
-      .catch(() => setError("Error al cargar el historial de conceptos"))
-      .finally(() => setLoadingConcepts(false));
-  }, [user]);
+        setConcepts(response.data);
+        setMeta(response.meta);
+      } catch (err) {
+        console.error(err);
+        setError("Error al cargar el historial de conceptos");
+      } finally {
+        setLoadingConcepts(false);
+      }
+    };
+
+    fetchConcepts();
+  }, [user, page]);
+
+  const handleNextPage = () => {
+    if (meta?.hasNextPage) setPage((prev) => prev + 1);
+  };
+
+  const handlePrevPage = () => {
+    if (meta?.hasPrevPage) setPage((prev) => prev - 1);
+  };
 
   return (
     <div>
       <Header />
 
-      <main className="p-4 container">
-        {loadingConcepts && <p>Cargando conceptos...</p>}
-        {error && <p className="text-danger">{error}</p>}
-        {!loadingConcepts && concepts.length === 0 && (
-          <p>No hay conceptos registrados</p>
+      <main className="container py-4">
+        <div className="d-flex w-100 justify-content-end mb-4">
+          {meta && (
+            <small className="text-muted">Total: {meta.total} registros</small>
+          )}
+        </div>
+
+        {loadingConcepts && (
+          <div className="text-center py-5">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Cargando...</span>
+            </div>
+          </div>
         )}
 
-        <ul className="row list-unstyled g-4">
-          {concepts.map((concept) => (
-            <ConceptCard key={concept.slug} concept={concept} />
-          ))}
-        </ul>
+        {error && (
+          <div className="alert alert-danger" role="alert">
+            {error}
+          </div>
+        )}
+
+        {!loadingConcepts && concepts.length === 0 && !error && (
+          <div className="text-center py-5 bg-light rounded">
+            <p className="mb-0 text-muted">
+              No hay conceptos registrados en esta página.
+            </p>
+          </div>
+        )}
+
+        {!loadingConcepts && concepts.length > 0 && (
+          <>
+            <ul className="row list-unstyled g-4 d-flex justify-content-center">
+              {concepts.map((concept) => (
+                <ConceptCard key={concept.slug} concept={concept} />
+              ))}
+            </ul>
+
+            <nav aria-label="Navegación de conceptos" className="mt-5">
+              <ul className="pagination justify-content-center">
+                <li
+                  className={`page-item ${
+                    !meta?.hasPrevPage ? "disabled" : ""
+                  }`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={handlePrevPage}
+                    disabled={!meta?.hasPrevPage}
+                  >
+                    Anterior
+                  </button>
+                </li>
+
+                <li className="page-item disabled">
+                  <span className="page-link">
+                    Página {meta?.page} de {meta?.totalPages}
+                  </span>
+                </li>
+
+                <li
+                  className={`page-item ${
+                    !meta?.hasNextPage ? "disabled" : ""
+                  }`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={handleNextPage}
+                    disabled={!meta?.hasNextPage}
+                  >
+                    Siguiente
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </>
+        )}
       </main>
     </div>
   );
