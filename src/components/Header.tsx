@@ -25,9 +25,11 @@ export default function Header() {
             className="bi bi-clock-history fs-4"
             style={{ cursor: "pointer" }}
           ></i>
-        ) : pathname.includes("/crear-qr") ? (
+        ) : pathname.includes("/crear-qr") ||
+          pathname.includes("/editar-qr") ? (
           <i
             className="bi bi-arrow-left fs-4"
+            style={{ cursor: "pointer" }}
             onClick={() => router.push("/historial")}
           ></i>
         ) : (

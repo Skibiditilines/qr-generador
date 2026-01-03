@@ -8,7 +8,7 @@ export async function PUT(req: Request) {
     const accountId = auth.sub;
 
     const body = await req.json();
-    const { concept_id, content, color, image_url, slug, note } = body;
+    const { concept_id, content, color, image_url, note } = body;
 
     if (!concept_id) {
       return NextResponse.json(
@@ -39,8 +39,8 @@ export async function PUT(req: Request) {
         content,
         color,
         image_url,
-        slug,
         note,
+        date: new Date(),
       },
     });
 
