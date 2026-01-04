@@ -227,6 +227,22 @@ export default function CrearQRPage() {
                       disabled={isLoading}
                     />
                   </div>
+                  {imagePreview && (
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-danger d-flex align-items-center gap-2 mt-3 px-3 rounded-pill"
+                      style={{ alignSelf: "center" }}
+                      disabled={isLoading}
+                      onClick={() => {
+                        setImageFile(null);
+                        setImagePreview(null);
+                        setIsCreated(false);
+                      }}
+                    >
+                      <i className="bi bi-trash"></i>
+                      Eliminar imagen
+                    </button>
+                  )}
                 </div>
               </div>
 
