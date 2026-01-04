@@ -5,7 +5,7 @@ const JWT_SECRET = process.env.JWT_SECRET!;
 
 export function signToken(payload: object) {
   const token = jwt.sign(payload, JWT_SECRET, {
-    expiresIn: "24h",
+    expiresIn: "30d",
   });
 
   const decoded = jwt.decode(token) as { exp: number };

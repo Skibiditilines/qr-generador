@@ -21,11 +21,9 @@ export const MarkdownEditor: React.FC<SimpleMarkdownEditorProps> = ({
         commands={[
           commands.bold,
           commands.italic,
-          commands.strikethrough,
           commands.divider,
           commands.orderedListCommand,
           commands.unorderedListCommand,
-          commands.checkedListCommand,
         ]}
         extraCommands={[]}
       />

@@ -15,6 +15,7 @@ export default function Header() {
   const getTitle = () => {
     if (pathname.includes("/historial")) return "Historial";
     if (pathname.includes("/crear-qr")) return "Crear Código QR";
+    if (pathname.includes("/editar-qr")) return "Editar Código QR";
     return "Aplicación QR";
   };
   return (

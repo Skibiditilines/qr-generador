@@ -7,24 +7,21 @@ export async function DELETE(req: Request) {
     const auth = getAuthData(req);
     const accountId = auth.sub;
 
-    // Obtener ID desde query params (ej: /api/concepts/delete?id=1)
     const { searchParams } = new URL(req.url);
-    const idParam = searchParams.get("id");
+    const slug = searchParams.get("slug");
 
-    if (!idParam) {
+    if (!slug) {
       return NextResponse.json(
-        { message: "ID parameter is required" },
+        { message: "Slug parameter is required" },
         { status: 400 }
       );
     }
 
-    const conceptId = parseInt(idParam);
-
-    // Verificar propiedad
     const existingConcept = await prisma.concept.findFirst({
       where: {
-        concept_id: conceptId,
+        slug,
         account_id: accountId,
+        is_active: true,
       },
     });
 
@@ -35,9 +32,8 @@ export async function DELETE(req: Request) {
       );
     }
 
-    // Borrado Lógico (Soft Delete)
     await prisma.concept.update({
-      where: { concept_id: conceptId },
+      where: { concept_id: existingConcept.concept_id },
       data: { is_active: false },
     });
 

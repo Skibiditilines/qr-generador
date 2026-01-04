@@ -11,7 +11,7 @@ export async function loginService(
 
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
-      throw new Error("Correo o contraseña incorrectos");
+      throw new Error("Usuario o contraseña incorrectos");
     }
     if (response.status >= 500) {
       throw new Error("Error interno del servidor");

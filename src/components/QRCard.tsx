@@ -15,7 +15,7 @@ export default function QRCard({ concept }: Props) {
 
   return (
     <>
-      <div className="card w-100 shadow-sm rounded-4" style={{ maxWidth: 380 }}>
+      <div className="card w-100 shadow-sm rounded-1" style={{ maxWidth: 380 }}>
         <div className="p-3">
           <span className="d-flex align-items-center gap-3 mb-4">
             <i className="bi bi-phone-fill"></i>
@@ -62,7 +62,7 @@ export default function QRCard({ concept }: Props) {
 
         {concept.note && (
           <div
-            className="px-3 py-4 mt-3 rounded-bottom-4"
+            className="px-3 py-3 mt-3 rounded-bottom-1"
             style={{ backgroundColor: concept.color || "#6c757d" }}
           >
             <p className="fw-semibold text-light mb-0 fs-6">{concept.note}</p>

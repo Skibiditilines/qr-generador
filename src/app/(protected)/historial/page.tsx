@@ -54,6 +54,19 @@ export default function HistorialPage() {
     fetchConcepts();
   }, [user, page]);
 
+  /** 🔥 ELIMINACIÓN EN TIEMPO REAL */
+  const handleConceptDeleted = (slug: string) => {
+    setConcepts((prev) => prev.filter((c) => c.slug !== slug));
+    setMeta((prev) =>
+      prev
+        ? {
+            ...prev,
+            total: prev.total - 1,
+          }
+        : prev
+    );
+  };
+
   const handleNextPage = () => {
     if (meta?.hasNextPage) setPage((prev) => prev + 1);
   };
@@ -75,9 +88,7 @@ export default function HistorialPage() {
 
         {loadingConcepts && (
           <div className="text-center py-5">
-            <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Cargando...</span>
-            </div>
+            <div className="spinner-border text-primary" role="status" />
           </div>
         )}
 
@@ -99,11 +110,15 @@ export default function HistorialPage() {
           <>
             <ul className="row list-unstyled g-4 d-flex justify-content-center">
               {concepts.map((concept) => (
-                <ConceptCard key={concept.slug} concept={concept} />
+                <ConceptCard
+                  key={concept.slug}
+                  concept={concept}
+                  onDeleted={handleConceptDeleted}
+                />
               ))}
             </ul>
 
-            <nav aria-label="Navegación de conceptos" className="mt-5">
+            <nav className="mt-5">
               <ul className="pagination justify-content-center">
                 <li
                   className={`page-item ${
