@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 import Image from "next/image";
 import { useState } from "react";
 import ImageModal from "@/components/ImageModal";
+import remarkBreaks from "remark-breaks";
 
 interface Props {
   concept: AllConceptResponse;
@@ -42,6 +43,7 @@ export default function QRCard({ concept }: Props) {
           )}
 
           <ReactMarkdown
+            remarkPlugins={[remarkBreaks]}
             components={{
               h1: ({ children }) => (
                 <h1 className="fs-6 fw-bold mb-2">{children}</h1>
