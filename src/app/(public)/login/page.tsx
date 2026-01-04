@@ -1,17 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { validateUser, validatePassword } from "@/utils/validators";
 import { useAuth } from "@/auth/useAuth";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const { login, isAuthenticated } = useAuth();
   const router = useRouter();
-
+  const [errors, setErrors] = useState<{ user?: string; password?: string }>(
+    {}
+  );
+  const [loginError, setLoginError] = useState<string | null>(null);
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -21,8 +24,21 @@ export default function LoginPage() {
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    setErrors({});
     setLoading(true);
-    setError(null);
+    setLoginError(null);
+
+    const userError = validateUser(user);
+    const passwordError = validatePassword(password);
+
+    if (userError || passwordError) {
+      setErrors({
+        user: userError || undefined,
+        password: passwordError || undefined,
+      });
+      setLoading(false);
+      return;
+    }
 
     try {
       const result = await login(user, password);
@@ -30,9 +46,9 @@ export default function LoginPage() {
       router.push("/historial");
     } catch (err) {
       if (err instanceof Error) {
-        setError(err.message);
+        setLoginError(err.message);
       } else {
-        setError("Error inesperado");
+        setLoginError("Error inesperado");
       }
     } finally {
       setLoading(false);
@@ -74,6 +90,11 @@ export default function LoginPage() {
                   onChange={(e) => setUser(e.target.value)}
                   required
                 />
+                {errors.user && (
+                  <div className="text-danger mt-1" role="alert">
+                    {errors.user}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -90,11 +111,18 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+                {errors.password && (
+                  <div className="text-danger mt-1" role="alert">
+                    {errors.password}
+                  </div>
+                )}
               </div>
             </div>
 
-            {error && (
-              <div className="alert alert-danger py-2 text-center">{error}</div>
+            {loginError && (
+              <div className="alert alert-danger py-2 mb-3" role="alert">
+                {loginError}
+              </div>
             )}
 
             <button
