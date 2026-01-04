@@ -28,7 +28,7 @@ export default async function ConceptPage({ params }: Props) {
   return (
     <main
       className="d-flex justify-content-center align-items-center px-3 py-5"
-      style={{ height: "100dvh", width: "100vw", overflow: "hidden" }}
+      style={{ width: "100vw" }}
     >
       <QRCardUI concept={concept} />
     </main>
