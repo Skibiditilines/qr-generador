@@ -24,16 +24,19 @@ export default function QRCard({ concept }: Props) {
 
           {concept.image_url && (
             <div
-              style={{ cursor: "pointer" }}
+              style={{ width: "150px", cursor: "pointer" }}
+              className="mb-3"
               onClick={() => setShowModal(true)}
               title="Click para ampliar"
             >
               <Image
                 src={concept.image_url}
                 alt="Imagen del código QR"
-                width={160}
-                height={90}
-                className="object-fit-cover rounded-3 mb-3"
+                width={0}
+                height={0}
+                sizes="100vw"
+                style={{ width: "100%", height: "auto" }}
+                className="rounded-3 d-block"
               />
             </div>
           )}

@@ -179,7 +179,7 @@ export default function EditQrPage() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="d-flex vh-100 justify-content-center align-items-center">
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Cargando...</span>
         </div>
@@ -265,6 +265,22 @@ export default function EditQrPage() {
                       disabled={isSaving}
                     />
                   </div>
+                  {imagePreview && (
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-danger d-flex align-items-center gap-2 mt-3 px-3 rounded-pill"
+                      style={{ alignSelf: "center" }}
+                      disabled={isLoading}
+                      onClick={() => {
+                        setImageFile(null);
+                        setImagePreview(null);
+                        setSuccessMsg(null);
+                      }}
+                    >
+                      <i className="bi bi-trash"></i>
+                      Eliminar imagen
+                    </button>
+                  )}
                 </div>
               </div>
 
