@@ -1,6 +1,7 @@
 "use client";
 
 import MDEditor, { commands } from "@uiw/react-md-editor";
+import remarkBreaks from "remark-breaks";
 
 interface SimpleMarkdownEditorProps {
   value: string;
@@ -18,6 +19,9 @@ export const MarkdownEditor: React.FC<SimpleMarkdownEditorProps> = ({
         onChange={(val) => onChange(val || "")}
         height={240}
         preview="edit"
+        previewOptions={{
+          remarkPlugins: [remarkBreaks],
+        }}
         commands={[
           commands.bold,
           commands.italic,
