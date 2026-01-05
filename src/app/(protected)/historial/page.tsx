@@ -54,7 +54,6 @@ export default function HistorialPage() {
     fetchConcepts();
   }, [user, page]);
 
-  /** 🔥 ELIMINACIÓN EN TIEMPO REAL */
   const handleConceptDeleted = (slug: string) => {
     setConcepts((prev) => prev.filter((c) => c.slug !== slug));
     setMeta((prev) =>
@@ -99,10 +98,8 @@ export default function HistorialPage() {
         )}
 
         {!loadingConcepts && concepts.length === 0 && !error && (
-          <div className="text-center py-5 bg-light rounded">
-            <p className="mb-0 text-muted">
-              No hay conceptos registrados en esta página.
-            </p>
+          <div className="text-center py-5 rounded">
+            <p className="mb-0">No hay conceptos registrados en esta página.</p>
           </div>
         )}
 
