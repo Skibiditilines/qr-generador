@@ -18,11 +18,6 @@ export default function QRCard({ concept }: Props) {
     <>
       <div className="card w-100 shadow-sm rounded-1" style={{ maxWidth: 380 }}>
         <div className="p-3">
-          <span className="d-flex align-items-center gap-3 mb-4">
-            <i className="bi bi-phone-fill"></i>
-            <h1 className="fw-semibold fs-5 mb-0">Resultado del QR</h1>
-          </span>
-
           {concept.image_url && (
             <div
               style={{ width: "150px", cursor: "pointer" }}

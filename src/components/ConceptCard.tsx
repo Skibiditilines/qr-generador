@@ -23,7 +23,12 @@ export default function ConceptCard({ concept, onDeleted }: Props) {
   const url = `http://generadordeqr.vercel.app/${concept.slug}`;
 
   useEffect(() => {
-    QRCode.toDataURL(url, { width: 500, margin: 2 }).then(setQr);
+    QRCode.toDataURL(url, {
+      width: 500,
+      margin: 1,
+      errorCorrectionLevel: "H",
+      scale: 8,
+    }).then(setQr);
   }, [url]);
 
   async function handleDelete() {
